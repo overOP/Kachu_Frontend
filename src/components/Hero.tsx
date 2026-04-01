@@ -44,6 +44,9 @@ const Hero: React.FC = () => {
                 </div>
               )}
 
+
+
+hello
               {/* VIDEO */}
               {slide.type === "video" && (
                 <div className="w-full h-full relative">
