@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 interface Product {
@@ -11,6 +11,7 @@ interface Product {
   rate: string;
   quantity: string;
   logo: string;
+  Description: string;
 }
 
 const Products: React.FC = () => {
@@ -28,6 +29,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://i.pinimg.com/originals/1e/c1/d2/1ec1d2ce366d1f603b1bde70ae508063.png",
+        Description: "High-quality cocoa powder perfect for baking and beverages."
       },
       {
         id: 2,
@@ -38,6 +40,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://i.pinimg.com/originals/1e/c1/d2/1ec1d2ce366d1f603b1bde70ae508063.png",
+        Description: "Rich and delicious dark chocolate for desserts and snacks."
       },
     ],
     kraft: [
@@ -50,6 +53,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://logos-world.net/wp-content/uploads/2023/03/Kraft-Foods-Logo-1960-500x281.png",
+        Description: "Creamy and flavorful cheese for your meals."
       },
       {
         id: 4,
@@ -60,6 +64,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://logos-world.net/wp-content/uploads/2023/03/Kraft-Foods-Logo-1960-500x281.png",
+        Description: "Smooth and fresh butter for cooking and baking."
       },
     ],
     pepsi: [
@@ -72,6 +77,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://1000logos.net/wp-content/uploads/2017/05/Pepsi-Logo-1969-2048x1152.png",
+        Description: "Refreshing and carbonated soft drink in a can."
       },
       {
         id: 6,
@@ -82,6 +88,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://1000logos.net/wp-content/uploads/2017/05/Pepsi-Logo-1969-2048x1152.png",
+        Description: "Refreshing Pepsi in a convenient bottle size."
       },
     ],
     nestle: [
@@ -94,6 +101,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://logoeps.com/wp-content/uploads/2013/04/nestle-deserts-vector-logo.png",
+        Description: "Fresh and nutritious milk for your family."
       },
       {
         id: 8,
@@ -104,6 +112,7 @@ const Products: React.FC = () => {
         rate: "4.5(1k reviews)",
         quantity: "MOQ: 50 units",
         logo: "https://logoeps.com/wp-content/uploads/2013/04/nestle-deserts-vector-logo.png",
+        Description: "Delicious chocolate wafers to enjoy anytime."
       },
     ],
   };
@@ -130,13 +139,12 @@ const Products: React.FC = () => {
         Showing {startIndex + 1}-{endIndex} of {allProducts.length}
       </p>
 
-      {/* --- Product Grid --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
         {currentProducts.map((item) => (
           <div
             key={item.id}
             onClick={() => navigate(`/product/${item.id}`, { state: item })}
-            className="bg-[#DBDEE4]  rounded-2xl overflow-hidden group border-b-5 border-gray-300 shadow-[4px_4px_10px_rgba(0,0,0,0.2)] cursor-pointer"
+            className="bg-[#DBDEE4] rounded-2xl overflow-hidden group border-b-5 border-gray-300 shadow-[4px_4px_10px_rgba(0,0,0,0.2)] cursor-pointer"
           >
             <div className="relative overflow-hidden bg-white">
               <img
@@ -154,22 +162,6 @@ const Products: React.FC = () => {
             </div>
 
             <div className="bg-white p-5 relative">
-              {/* <div className="flex items-center justify-between">
-                <p className="text-sm text-[#0000004D]">{item.brand}</p>
-                <p className="flex items-center gap-1 text-sm text-gray-600">
-                  <svg width="0" height="0">
-                    <defs>
-                      <linearGradient id="gradStar" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#facc15" />
-                        <stop offset="100%" stopColor="#f97316" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <FaStar style={{ fill: "url(#gradStar)" }} />
-                  {item.rate}
-                </p>
-              </div> */}
-
               <p className="text-gray-500">{item.quantity}</p>
               <h3 className="font-bold">{item.name}</h3>
               <p className="text-gray-500 mt-1">Price</p>
@@ -187,9 +179,7 @@ const Products: React.FC = () => {
         ))}
       </div>
 
-      {/* --- Pagination Controls --- */}
       <div className="flex justify-center items-center gap-3 mt-8 flex-wrap">
-        {/* Previous */}
         <button
           onClick={handlePrev}
           disabled={currentPage === 1}
@@ -198,7 +188,6 @@ const Products: React.FC = () => {
           <FaChevronLeft />
         </button>
 
-        {/* Page Numbers */}
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <button
             key={page}
@@ -211,7 +200,6 @@ const Products: React.FC = () => {
           </button>
         ))}
 
-        {/* Next */}
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages}

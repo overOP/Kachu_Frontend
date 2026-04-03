@@ -6,7 +6,7 @@ import logo from "../assets/logo.png";
 const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-10 w-full flex justify-center z-50">
-      <div className="w-full max-w-325 h-14 mx-4 md:mx-10 rounded-2xl bg-gray-200 px-6 md:px-8 flex items-center justify-between text-black">
+      <div className="w-full max-w-325 h-14 mx-4 md:mx-10 rounded-2xl bg-gray-300 px-6 md:px-8 flex items-center justify-between text-black">
         {/* Logo */}
         <div className="flex items-center">
           <Link to="/">
