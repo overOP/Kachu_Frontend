@@ -1,8 +1,9 @@
 import React from "react";
-import { FaWhatsapp } from "react-icons/fa";
+import { IoLogoWhatsapp } from "react-icons/io";
 import { useParams } from "react-router-dom";
 
-type Factory = {
+// --- Types ---
+interface FactoryDetails {
   title: string;
   banner: string;
   desc: string;
@@ -10,25 +11,32 @@ type Factory = {
   bottomImg: string;
   location: string;
   established: string;
-};
+}
 
-type Product = {
+interface Product {
   id: number;
   name: string;
   price: string;
   img: string;
-};
+}
 
-type FactoryKey = "coco" | "kraft" | "pepsi" | "nestle";
+interface FactoryDetailsMap {
+  [key: string]: FactoryDetails;
+}
 
-const ShopBydetails: React.FC = () => {
-  const { name } = useParams<{ name: FactoryKey }>();
+interface ProductsMap {
+  [key: string]: Product[];
+}
 
-  const factoryDetails: Record<FactoryKey, Factory> = {
-    coco: {
+const Factoriedetails: React.FC = () => {
+  const { name } = useParams<{ name: string }>();
+
+  // --- Factory Data ---
+  const factoryDetails: FactoryDetailsMap = {
+    Coco: {
       title: "Coco Factory",
-      banner: "../public/shop/coco/cococo.png",
-      desc: "Bottlers Nepal Limited (BNL) is a public listed company in Nepal, with operations spanning over 44 years, located in the Balaju Indistrial District (BID) in Kathmandu. The plant has both Returnable Glass Bottles (RGB) and PET packaging lines, producing different products from the portfolio to serve consumers their favorite beverages at all times.",
+      banner: "/shop/coco/cococo.png",
+      desc: "Bottlers Nepal Limited (BNL) is a public listed company in Nepal, with operations spanning over 44 years, located in the Balaju Industrial District (BID) in Kathmandu. The plant has both Returnable Glass Bottles (RGB) and PET packaging lines, producing different products from the portfolio to serve consumers their favorite beverages at all times.",
       sideImg: "/shop/coco/img2.png",
       bottomImg: "/shop/coco/img3.png",
       location:
@@ -51,25 +59,22 @@ const ShopBydetails: React.FC = () => {
       sideImg: "/shop/pepsi/img2.jpg",
       bottomImg: "/shop/pepsi/img3.jpg",
       location: "Pepsi-Cola, Kathmandu, Nepal\nNawalparasi, Nepal",
-      established: "1985 ",
+      established: "1985",
     },
     nestle: {
       title: "Nestlé",
-      banner:
-        "https://fabrikbrands.com/wp-content/uploads/Brands-Owned-By-Nestle-hero-scaled.jpg",
+      banner: "https://fabrikbrands.com/wp-content/uploads/Brands-Owned-By-Nestle-hero-scaled.jpg",
       desc: "Nestlé is one of the world's largest food and beverage companies, founded in Switzerland in 1867. In Nepal, Nestlé products such as Nescafé, Maggi, KitKat, Cerelac, and Lactogen are widely available through distributors and retail networks. The company does not operate a major manufacturing plant in Nepal but serves the market through imports and distribution channels.",
-      sideImg:
-        "https://i.pinimg.com/736x/19/9d/ca/199dca07de54667b5aa94ee12baf0185.jpg",
-      bottomImg:
-        "https://i.pinimg.com/736x/37/c5/2e/37c52e536dba34327750afcc86d2a84c.jpg",
-      location:
-        "Available across Nepal (via distributors)\nNo manufacturing plant in Nepal",
+      sideImg: "https://i.pinimg.com/736x/19/9d/ca/199dca07de54667b5aa94ee12baf0185.jpg",
+      bottomImg: "https://i.pinimg.com/736x/37/c5/2e/37c52e536dba34327750afcc86d2a84c.jpg",
+      location: "Available across Nepal (via distributors)\nNo manufacturing plant in Nepal",
       established: "1867 (Global Company)",
     },
   };
 
-  const productsData: Record<FactoryKey, Product[]> = {
-    coco: [
+  // --- Products Data ---
+  const productsData: ProductsMap = {
+    Coco: [
       { id: 1, name: "Coco Powder", price: "NPR 13641", img: "/products/coco1.png" },
       { id: 2, name: "Dark Chocolate", price: "NPR 1500", img: "/products/coco2.png" },
       { id: 3, name: "Cocoa Butter", price: "NPR 2200", img: "/products/coco3.png" },
@@ -95,8 +100,8 @@ const ShopBydetails: React.FC = () => {
     ],
   };
 
-  const factory = name ? factoryDetails[name] : undefined;
-  const products = name ? productsData[name] : [];
+  const factory: FactoryDetails | undefined = name ? factoryDetails[name] : undefined;
+  const products: Product[] | undefined = name ? productsData[name] : undefined;
 
   if (!factory) return <div className="p-10">Factory not found</div>;
 
@@ -104,8 +109,8 @@ const ShopBydetails: React.FC = () => {
     <div className="bg-gray-100 min-h-screen">
       {/* Banner */}
       <div className="relative">
-        <img src={factory.banner} alt="" className="w-full h-100 object-cover" />
-        <h1 className="absolute bottom-6 left-40 mb-28 text-white text-3xl font-bold">
+        <img src={factory.banner} alt={factory.title} className="w-full h-100 object-cover -mt-16" />
+        <h1 className="absolute bottom-6 left-10 text-white text-3xl font-bold">
           {factory.title}
         </h1>
       </div>
@@ -113,19 +118,26 @@ const ShopBydetails: React.FC = () => {
       {/* Info Section */}
       <div className="grid md:grid-cols-2 gap-8 p-6 md:p-12 bg-gray-200">
         <div>
-          <p className="text-gray-700 text-[19px] leading-relaxed mt-40">
-            {factory.desc}
-          </p>
-          <img src={factory.bottomImg} alt="" className="rounded-xl w-162 h-106 mt-50" />
+          <p className="text-gray-700 text-[19px] leading-relaxed mt-10">{factory.desc}</p>
+          <img
+            src={factory.bottomImg}
+            alt={factory.title}
+            className="rounded-xl w-full mt-6"
+          />
         </div>
 
         <div>
-          <img src={factory.sideImg} alt="" className="rounded-xl w-90 h-112.5 mt-4 ml-50" />
-          <div className="p-4 rounded-xl mt-40 flex flex-col gap-4">
+          <img
+            src={factory.sideImg}
+            alt={factory.title}
+            className="rounded-xl w-full mt-4"
+          />
+          <div className="p-4 rounded-xl mt-6 flex flex-col gap-4 bg-white shadow-sm">
             <p className="text-gray-700 text-sm whitespace-pre-line">
               <strong className="text-[19px]">Location</strong> <br />
               <span className="text-[16px]">{factory.location}</span>
             </p>
+
             <p className="text-gray-700 text-sm">
               <strong className="text-[19px]">Established</strong> <br />
               <span className="text-[16px]">{factory.established}</span>
@@ -141,7 +153,7 @@ const ShopBydetails: React.FC = () => {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((item) => (
+          {products?.map((item) => (
             <div
               key={item.id}
               className="relative bg-white rounded-xl shadow hover:shadow-lg p-4 transition"
@@ -152,7 +164,7 @@ const ShopBydetails: React.FC = () => {
                 rel="noreferrer"
                 className="absolute bottom-4 right-4 bg-green-500 text-white p-2 rounded-full text-xl hover:scale-110 transition"
               >
-                <FaWhatsapp />
+                <IoLogoWhatsapp />
               </a>
 
               <img
@@ -160,7 +172,6 @@ const ShopBydetails: React.FC = () => {
                 alt={item.name}
                 className="w-full h-40 object-cover rounded-lg mb-3"
               />
-
               <h3 className="font-semibold">{item.name}</h3>
               <p className="text-gray-500 text-sm">{item.price}</p>
             </div>
@@ -171,4 +182,4 @@ const ShopBydetails: React.FC = () => {
   );
 };
 
-export default ShopBydetails;  
+export default Factoriedetails;

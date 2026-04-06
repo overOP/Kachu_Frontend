@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
@@ -13,7 +13,7 @@ interface Brand {
   Brand: string;
   size: number;
   name: string;
-  description: string; // ✅ new field
+  description: string;
   render: () => React.ReactNode;
 }
 
@@ -25,24 +25,23 @@ const imgStyle: React.CSSProperties = {
 };
 
 const brands: Brand[] = [
-  { name: "pg", bg: "#1B3A8C", size: 120, Brand:"P&G",description: "Procter & Gamble products", render: () => <img src="../shop/p&g.png" style={imgStyle} /> },
-  { name: "loreal", bg: "#f5d4dd", size: 120, Brand:"L'Oréal",description: "L'Oréal Paris cosmetics", render: () => <img src="../shop/L’Oreal Paris.png" style={imgStyle} /> },
-  { name: "coco", bg: "#E8001C", size: 120, Brand:"Coca-Cola",description: "Coca-Cola beverages", render: () => <img src="../shop/coco.png" style={imgStyle} /> },
-  { name: "kraft", bg: "white", size: 120, Brand:"Kraft",description: "Kraft dairy & food products", render: () => <img src="../shop/kraft.png" style={imgStyle} /> },
-  { name: "nestle", bg: "#D0021B", size: 120, Brand:"Nestlé",description: "Nestlé food and drinks", render: () => <img src="../shop/nestle.webp" style={imgStyle} /> },
-  { name: "pepsi", bg: "white", size: 120, Brand:"Pepsi",description: "Pepsi beverages", render: () => <img src="../shop/pepsi.png" style={imgStyle} /> },
+  { name: "pg", bg: "#1B3A8C", size: 110, Brand: "P&G", description: "Procter & Gamble products", render: () => <img src="../shop/p&g.png" style={imgStyle} /> },
+  { name: "loreal", bg: "#f5d4dd", size: 110, Brand: "L'Oréal", description: "L'Oréal Paris cosmetics", render: () => <img src="../shop/L’Oreal Paris.png" style={imgStyle} /> },
+  { name: "coco", bg: "#E8001C", size: 110, Brand: "Coca-Cola", description: "Coca-Cola beverages", render: () => <img src="../shop/coco.png" style={imgStyle} /> },
+  { name: "kraft", bg: "white", size: 110, Brand: "Kraft", description: "Kraft dairy & food products", render: () => <img src="../shop/kraft.png" style={imgStyle} /> },
+  { name: "nestle", bg: "#D0021B", size: 110, Brand: "Nestlé", description: "Nestlé food and drinks", render: () => <img src="../shop/nestle.webp" style={imgStyle} /> },
+  { name: "pepsi", bg: "white", size: 110, Brand: "Pepsi", description: "Pepsi beverages", render: () => <img src="../shop/pepsi.png" style={imgStyle} /> },
 ];
 
 const W = 2000;
 const H = 400;
 
+// Build a smooth S-curve for motion path
 function buildCurve(): string {
-  const padding = 100;
+  const padding = 120;
   const usableWidth = W - padding * 2;
-
   const xs = brands.map((_, i) => padding + i * (usableWidth / (brands.length - 1)));
   const ys = brands.map((_, i) => (i % 2 === 0 ? 120 : 260));
-
   let d = `M${xs[0]},${ys[0]}`;
   for (let i = 0; i < xs.length - 1; i++) {
     const cx = (xs[i] + xs[i + 1]) / 2;
@@ -54,33 +53,53 @@ function buildCurve(): string {
 const ShopBy: React.FC = () => {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const step = 1 / (brands.length - 1);
-  const positions = useRef<number[]>(brands.map((_, i) => i * step));
+  const total = brands.length;
+  const centerIndex = Math.floor(total / 2);
+  const gap = 0.17; // Best spacing
+  const positions = useRef<number[]>(brands.map((_, i) => 0.5 + (i - centerIndex) * gap));
+  const clamp = (val: number) => Math.max(0, Math.min(1, val));
 
-  useEffect(() => {
-    brands.forEach((_, i) => {
-      gsap.set(`.brand-node-${i}`, {
-        motionPath: {
-          path: "#factoryPath",
-          align: "#factoryPath",
-          alignOrigin: [0.5, 0.5],
-          start: positions.current[i],
-          end: positions.current[i],
-        },
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      brands.forEach((_, i) => {
+        let pos = clamp(positions.current[i]);
+        positions.current[i] = pos;
+
+        // Set initial motion path
+        gsap.set(`.brand-node-${i}`, {
+          motionPath: {
+            path: "#factoryPath",
+            align: "#factoryPath",
+            alignOrigin: [0.5, 0.5],
+            start: pos,
+            end: pos,
+          },
+        });
+
+        // Initial scale
+        gsap.set(`.brand-node-${i}`, {
+          scale: i === centerIndex ? 1.6 : 0.9,
+          zIndex: i === centerIndex ? 50 : 10,
+          borderRadius: i === centerIndex ? 8 : "50%",
+        });
+
+        animateNode(i, pos);
       });
+    }, containerRef);
 
-      animateNode(i, positions.current[i]);
-    });
+    return () => ctx.revert();
   }, []);
 
   const animateNode = (index: number, startPos: number) => {
-    const step = 1 / (brands.length - 1);
+    const step = gap;
     const endPos = startPos + step;
 
     gsap.to(`.brand-node-${index}`, {
-      duration: 5,
-      ease: "none",
+      delay: 0.1,
+      duration: 6,
+      ease: "power1.inOut",
       motionPath: {
         path: "#factoryPath",
         align: "#factoryPath",
@@ -88,25 +107,19 @@ const ShopBy: React.FC = () => {
         start: startPos,
         end: endPos > 1 ? 1 : endPos,
       },
-
-      // ✅ ZOOM EFFECT
       onUpdate: function () {
         const progress = (this as gsap.core.Tween).progress();
         const current = startPos + progress * (endPos - startPos);
+        const el = this.targets()[0];
 
-        const isCenter = Math.abs(current - 0.5) < 0.1;
+        // Smooth scaling: center zoom, sides smaller
+        const scale = Math.abs(current - 0.5) < 0.08 ? 1.6 : 0.9;
+        const zIndex = Math.abs(current - 0.5) < 0.08 ? 50 : 10;
+        const borderRadius = Math.abs(current - 0.5) < 0.08 ? 8 : "50%";
 
-        gsap.to(this.targets()[0], {
-          scale: isCenter ? 1.6 : 1,
-          zIndex: isCenter ? 50 : 10,
-          borderRadius: isCenter ? 8 : "50%",
-          duration: 0.3,
-        });
+        gsap.to(el, { scale, zIndex, borderRadius, duration: 0.3 });
       },
-
-      onComplete: () => {
-        animateNode(index, endPos > 1 ? 0 : endPos);
-      },
+      onComplete: () => animateNode(index, endPos > 1 ? 0 : endPos),
     });
   };
 
@@ -121,7 +134,7 @@ const ShopBy: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-200 py-6">
+    <div ref={containerRef} className="flex flex-col items-center bg-gray-200 py-6">
       <h2 className="text-2xl font-bold text-[#1a5c3c]">Shop by Factories</h2>
 
       <div className="relative mt-6" style={{ width: W, height: H }}>
@@ -137,8 +150,6 @@ const ShopBy: React.FC = () => {
               width: b.size,
               height: b.size,
               backgroundColor: b.bg,
-              borderRadius: 8, // ✅ SQUARE
-              zIndex: 10,
             }}
             onMouseEnter={() => handleEnter(i)}
             onMouseLeave={handleLeave}
@@ -147,17 +158,10 @@ const ShopBy: React.FC = () => {
             {b.render()}
 
             {hovered === i && (
-              <div className="absolute bottom-full mb-2 flex flex-col items-center z-[999]">
-                {/* Name */}
-                <div className="bg-gray-600 text-white text-xs px-3 py-1 rounded-md shadow-lg whitespace-nowrap">
-                  {b.Brand}
-                </div>
-                {/* Arrow */}
+              <div className="absolute bottom-full mb-2 flex flex-col items-center z-999">
+                <div className="bg-gray-600 text-white text-xs px-3 py-1 rounded-md shadow-lg whitespace-nowrap">{b.Brand}</div>
                 <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-black"></div>
-                {/* Description */}
-                <div className="mt-1 bg-gray-700 text-white text-xs px-2 py-1 rounded-md shadow-md whitespace-nowrap">
-                  {b.description}
-                </div>
+                <div className="mt-1 bg-gray-700 text-white text-xs px-2 py-1 rounded-md shadow-md whitespace-nowrap">{b.description}</div>
               </div>
             )}
           </div>
